@@ -13,7 +13,9 @@ const firebaseConfig = {
 };
 
 // Check if any keys are missing to determine Demo Mode
-export const isDemoMode = !firebaseConfig.apiKey || firebaseConfig.apiKey.includes('demo');
+export const isDemoMode = !firebaseConfig.apiKey ||
+  firebaseConfig.apiKey.includes('YOUR_') ||
+  firebaseConfig.apiKey.includes('demo');
 
 const app = !getApps().length ? initializeApp(isDemoMode ? {
   apiKey: "demo-key",

@@ -65,37 +65,37 @@ export const STAPLES: StaplesCategory[] = [
   },
   {
     cat: "2. Meat & Deli",
-    img: "1607623814075-e51df1dd65ed",
+    img: "/assets/recipes/cat_meat_deli.png",
     items: ["Rotisserie Chicken", "Deli Turkey (Family Pack)", "Turkey Jerky"]
   },
   {
     cat: "3. Aisle: Canned & Jars",
-    img: "1584306670957-acf935f8c440",
+    img: "/assets/recipes/cat_canned_jars.png",
     items: ["Canned Tuna", "Canned Chicken", "Canned Black Beans", "Canned Refried Beans", "Canned Corn", "Canned Lentil Soup", "Canned Chili", "Canned Pineapple/Peaches (in juice)", "Salsa", "Tomato Sauce", "Taco Sauce", "Peanut Butter", "Honey", "Pickles", "Relish"]
   },
   {
     cat: "4. Aisle: Grains & Dry Goods",
-    img: "1585816999208-4c3d321c83a7",
+    img: "/assets/recipes/cat_grains_dry.png",
     items: ["Rolled Oats (Bulk)", "Rice Pouches (Microwave)", "Tortillas (Corn & Flour)", "Rice Cakes", "Granola (Low Sugar)", "Protein Powder", "Almonds (Bulk)"]
   },
   {
     cat: "5. Condiments & Spices",
-    img: "1615486511484-92e5e436d6a6",
+    img: "/assets/recipes/cat_condiments.png",
     items: ["Light Mayo", "Mustard", "Salt & Pepper Shakers"]
   },
   {
     cat: "6. Dairy & Refrigerated",
-    img: "1628088062854-d1870b4558abd",
-    items: ["Eggs (18 pack)", "Greek Yogurt (Tub)", "Cottage Cheese", "String Cheese", "Shredded Cheese (Mexican Blend)", "Mozzarella (Shredded)", "Cream Cheese", "Hummus", "Milk or Almond Milk"]
+    img: "/assets/recipes/cat_dairy.png",
+    items: ["Greek Yogurt (Tub)", "Cottage Cheese", "String Cheese", "Shredded Cheese (Mexican Blend)", "Mozzarella (Shredded)", "Cream Cheese", "Hummus", "Milk or Almond Milk"]
   },
   {
     cat: "7. Freezer",
-    img: "1549494346-a97940b54d7e",
+    img: "/assets/recipes/cat_freezer.png",
     items: ["Frozen Mixed/Steamer Veggies", "Frozen Berries", "Frozen Spinach", "Frozen Edamame"]
   },
   {
     cat: "8. Beverages (Wegovy Safe)",
-    img: "1544145945-f90425340c7e",
+    img: "/assets/recipes/cat_beverages.png",
     items: ["Water Filter Bottle", "Crystal Light / Mio", "Ginger Tea Bags", "Peppermint Tea", "Electrolyte Powder"]
   }
 ];
