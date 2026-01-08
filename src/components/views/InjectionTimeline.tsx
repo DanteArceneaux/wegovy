@@ -14,10 +14,11 @@ export const InjectionTimeline = ({ shots, onClose }: InjectionTimelineProps) =>
 
     // Site map coordinates/paths
     const sites = [
-        { id: 'left_stomach', label: 'Left Stomach', x: '40%', y: '50%' },
-        { id: 'right_stomach', label: 'Right Stomach', x: '60%', y: '50%' },
+        { id: 'stomach_l', label: 'Stomach (L)', x: '40%', y: '50%' },
+        { id: 'stomach_r', label: 'Stomach (R)', x: '60%', y: '50%' },
         { id: 'left_thigh', label: 'Left Thigh', x: '42%', y: '75%' },
         { id: 'right_thigh', label: 'Right Thigh', x: '58%', y: '75%' },
+        // Keeping arms just in case user adds them later, but matching labels to logic
         { id: 'left_arm', label: 'Left Arm', x: '30%', y: '35%' },
         { id: 'right_arm', label: 'Right Arm', x: '70%', y: '35%' },
     ];
@@ -37,7 +38,7 @@ export const InjectionTimeline = ({ shots, onClose }: InjectionTimelineProps) =>
                     <ChevronLeft className="w-6 h-6" />
                 </button>
                 <h2 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-                    <Calendar className="w-5 h-5 text-indigo-500" /> Injection History
+                    <Activity className="w-5 h-5 text-indigo-500" /> Site Rotation
                 </h2>
                 <div className="w-10"></div> {/* Spacer */}
             </div>
@@ -46,13 +47,16 @@ export const InjectionTimeline = ({ shots, onClose }: InjectionTimelineProps) =>
                 {/* Site Rotation Map */}
                 <section>
                     <div className="flex justify-between items-center mb-6 px-1">
-                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Site Map</h3>
+                        <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Body Map Tracking</h3>
                         <div className="h-px flex-grow mx-4 bg-slate-100"></div>
                     </div>
 
-                    <Card className="p-8 relative min-h-[400px] flex items-center justify-center border-white shadow-premium">
+                    <Card className="p-8 relative min-h-[420px] flex items-center justify-center border-white shadow-premium overflow-hidden">
+                        {/* Decorative Background */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-slate-50/50 to-white pointer-events-none" />
+
                         {/* Simple Body Silhouette SVG */}
-                        <svg viewBox="0 0 200 400" className="w-full max-w-[200px] h-auto text-slate-100 fill-current opacity-40">
+                        <svg viewBox="0 0 200 400" className="w-full max-w-[220px] h-auto text-slate-200 fill-current opacity-60 z-0">
                             <path d="M100,20 C110,20 120,30 120,45 C120,60 110,70 100,70 C90,70 80,60 80,45 C80,30 90,20 100,20 Z" /> {/* Head */}
                             <path d="M70,80 C60,80 50,90 45,110 L30,200 C25,220 35,230 45,225 L60,150 L60,280 L70,380 C75,395 90,395 95,380 L100,320 L105,380 C110,395 125,395 130,380 L140,280 L140,150 L155,225 C165,230 175,220 170,200 L155,110 C150,90 140,80 130,80 L70,80 Z" /> {/* Body */}
                         </svg>
@@ -60,34 +64,51 @@ export const InjectionTimeline = ({ shots, onClose }: InjectionTimelineProps) =>
                         {/* Hotspots */}
                         {sites.map((site) => {
                             const count = getSiteCount(site.label);
-                            const lastShot = shots.find(s => s.site === site.label); // Note: sorting needed for actual "last"
+                            const lastShot = shots.find(s => s.site === site.label);
                             const isRecent = lastShot && sortedShots[0]?.id === lastShot.id;
 
                             return (
                                 <div
                                     key={site.id}
-                                    className="absolute transform -translate-x-1/2 -translate-y-1/2"
+                                    className="absolute transform -translate-x-1/2 -translate-y-1/2 z-10"
                                     style={{ left: site.x, top: site.y }}
                                 >
                                     <motion.div
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
-                                        className={`relative p-1.5 rounded-full border-2 transition-all ${isRecent ? 'bg-indigo-500 border-indigo-200' : count > 0 ? 'bg-indigo-100 border-indigo-50' : 'bg-white border-slate-100 opacity-30'
+                                        whileHover={{ scale: 1.1 }}
+                                        className={`relative w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${isRecent
+                                                ? 'bg-indigo-600 border-indigo-200 shadow-lg shadow-indigo-200'
+                                                : count > 0
+                                                    ? 'bg-white border-indigo-100 shadow-sm'
+                                                    : 'bg-white/40 border-slate-100 opacity-40'
                                             }`}
                                     >
+                                        <MapPin className={`w-4 h-4 ${isRecent ? 'text-white' : count > 0 ? 'text-indigo-600' : 'text-slate-400'}`} />
+
+                                        {/* Site Label (Optional, subtle) */}
+                                        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[7px] font-black text-slate-400 uppercase tracking-tighter opacity-0 group-hover:opacity-100">
+                                            {site.label.split(' ')[0]}
+                                        </div>
+
+                                        {/* PROMINENT NUMBER BADGE */}
+                                        {count > 0 && (
+                                            <motion.div
+                                                initial={{ scale: 0 }}
+                                                animate={{ scale: 1 }}
+                                                className="absolute -top-1.5 -right-1.5 bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-black border-2 border-white shadow-md"
+                                            >
+                                                {count}
+                                            </motion.div>
+                                        )}
+
+                                        {/* Status Glow for Recent */}
                                         {isRecent && (
-                                            <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-indigo-400 opacity-75"></span>
-                                                <span className="relative inline-flex rounded-full h-3 w-3 bg-indigo-500"></span>
+                                            <span className="absolute inset-0 rounded-full">
+                                                <span className="animate-ping absolute inset-0 rounded-full bg-indigo-400 opacity-20"></span>
                                             </span>
                                         )}
-                                        <MapPin className={`w-3.5 h-3.5 ${isRecent ? 'text-white' : count > 0 ? 'text-indigo-600' : 'text-slate-300'}`} />
                                     </motion.div>
-                                    {count > 0 && (
-                                        <div className="absolute top-1/2 left-full ml-2 whitespace-nowrap bg-white/90 backdrop-blur shadow-sm border border-slate-100 rounded-lg px-2 py-0.5 text-[9px] font-black text-slate-500">
-                                            {count} shots
-                                        </div>
-                                    )}
                                 </div>
                             );
                         })}
