@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
-import { User } from 'firebase/auth';
-import { 
-  doc, 
-  onSnapshot, 
-  collection, 
-  query, 
-  orderBy, 
-  where 
+import {
+  doc,
+  onSnapshot,
+  collection,
+  query,
+  orderBy,
+  where
 } from 'firebase/firestore';
-import { db, appId } from '../config/firebase';
+import { db, appId, GLOBAL_USER_ID, isDemoMode } from '../config/firebase';
 import { Settings, Shot, WeightEntry, DailyLog, FoodItem } from '../types';
 import { DEFAULT_SETTINGS } from '../constants';
 
-export const useUserData = (user: User | null) => {
+export const useUserData = () => {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [shots, setShots] = useState<Shot[]>([]);
   const [weightLog, setWeightLog] = useState<WeightEntry[]>([]);
@@ -20,20 +19,13 @@ export const useUserData = (user: User | null) => {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // Allow demo mode - if no user but in demo mode, use default settings
-    const isDemoMode = typeof window !== 'undefined' && !(window as any).__firebase_config;
-    if (!user) {
-      if (isDemoMode) {
-        // Already using defaults, no need to set up listeners
-        return;
-      }
-      return;
-    }
+    if (isDemoMode) return;
 
     const unsubscribers: (() => void)[] = [];
+    const uid = GLOBAL_USER_ID;
 
     // Settings listener
-    const settingsRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'profile');
+    const settingsRef = doc(db, 'artifacts', appId, 'users', uid, 'settings', 'profile');
     const unsubSettings = onSnapshot(
       settingsRef,
       (snap) => {
@@ -50,7 +42,7 @@ export const useUserData = (user: User | null) => {
 
     // Shots listener
     const shotsQ = query(
-      collection(db, 'artifacts', appId, 'users', user.uid, 'shots'),
+      collection(db, 'artifacts', appId, 'users', uid, 'shots'),
       orderBy('timestamp', 'desc')
     );
     const unsubShots = onSnapshot(
@@ -73,7 +65,7 @@ export const useUserData = (user: User | null) => {
 
     // Weight listener
     const weightQ = query(
-      collection(db, 'artifacts', appId, 'users', user.uid, 'weight'),
+      collection(db, 'artifacts', appId, 'users', uid, 'weight'),
       orderBy('date', 'asc')
     );
     const unsubWeight = onSnapshot(
@@ -89,7 +81,7 @@ export const useUserData = (user: User | null) => {
     unsubscribers.push(unsubWeight);
 
     // Shopping list listener
-    const listRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'shoppingList');
+    const listRef = doc(db, 'artifacts', appId, 'users', uid, 'data', 'shoppingList');
     const unsubList = onSnapshot(
       listRef,
       (docSnap) => {
@@ -107,18 +99,16 @@ export const useUserData = (user: User | null) => {
     return () => {
       unsubscribers.forEach(unsub => unsub());
     };
-  }, [user]);
-  
-  // In demo mode without user, return defaults
-  const isDemoMode = typeof window !== 'undefined' && !(window as any).__firebase_config;
-  if (!user && isDemoMode) {
+  }, []);
+
+  if (isDemoMode) {
     return { settings: DEFAULT_SETTINGS, shots: [], weightLog: [], boughtItems: {}, error: null };
   }
 
   return { settings, shots, weightLog, boughtItems, error };
 };
 
-export const useDailyLog = (user: User | null, viewDate: string) => {
+export const useDailyLog = (viewDate: string) => {
   const [dailyLog, setDailyLog] = useState<DailyLog>({
     calories: 0,
     protein: 0,
@@ -130,20 +120,13 @@ export const useDailyLog = (user: User | null, viewDate: string) => {
   const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    // Allow demo mode - if no user but in demo mode, use empty defaults
-    const isDemoMode = typeof window !== 'undefined' && !(window as any).__firebase_config;
-    if (!user) {
-      if (isDemoMode) {
-        // Already using defaults, no need to set up listeners
-        return;
-      }
-      return;
-    }
+    if (isDemoMode) return;
 
     const unsubscribers: (() => void)[] = [];
+    const uid = GLOBAL_USER_ID;
 
     // Daily log listener
-    const logRef = doc(db, 'artifacts', appId, 'users', user.uid, 'dailyLogs', viewDate);
+    const logRef = doc(db, 'artifacts', appId, 'users', uid, 'dailyLogs', viewDate);
     const unsubLog = onSnapshot(
       logRef,
       (docSnap) => {
@@ -167,7 +150,7 @@ export const useDailyLog = (user: User | null, viewDate: string) => {
 
     // Food items listener
     const itemsQ = query(
-      collection(db, 'artifacts', appId, 'users', user.uid, 'foodItems'),
+      collection(db, 'artifacts', appId, 'users', uid, 'foodItems'),
       where('dateString', '==', viewDate)
     );
     const unsubItems = onSnapshot(
@@ -185,18 +168,15 @@ export const useDailyLog = (user: User | null, viewDate: string) => {
     return () => {
       unsubscribers.forEach(unsub => unsub());
     };
-  }, [user, viewDate]);
-  
-  // In demo mode without user, return defaults
-  const isDemoMode = typeof window !== 'undefined' && !(window as any).__firebase_config;
-  if (!user && isDemoMode) {
-    return { 
-      dailyLog: { calories: 0, protein: 0, water: 0, symptoms: {}, notes: '' }, 
-      logItems: [], 
-      error: null 
+  }, [viewDate]);
+
+  if (isDemoMode) {
+    return {
+      dailyLog: { calories: 0, protein: 0, water: 0, symptoms: {}, notes: '' },
+      logItems: [],
+      error: null
     };
   }
 
   return { dailyLog, logItems, error };
 };
-

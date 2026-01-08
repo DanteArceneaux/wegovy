@@ -22,7 +22,7 @@ import { getLocalTodayStr, changeDateByDays } from './utils/dateHelpers';
 import { calculateBMI, getCycleDayForDate } from './utils/calculations';
 import { validateShot } from './utils/validation';
 import { DEFAULT_SETTINGS } from './constants';
-import { Settings, Recipe } from './types';
+import { Settings, Recipe, Shot } from './types';
 import { AnimatePresence, motion } from 'framer-motion';
 import { isDemoMode } from './config/firebase';
 
@@ -33,9 +33,9 @@ export default function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'analytics' | 'recipes'>('dashboard');
   const [viewDate, setViewDate] = useState(getLocalTodayStr());
 
-  const { settings, shots, weightLog, boughtItems, error: dataError } = useUserData(user);
-  const { dailyLog, logItems, error: logError } = useDailyLog(user, viewDate);
-  const actions = useWegovyActions(user);
+  const { settings, shots, weightLog, boughtItems, error: dataError } = useUserData();
+  const { dailyLog, logItems, error: logError } = useDailyLog(viewDate);
+  const actions = useWegovyActions();
 
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
@@ -50,7 +50,8 @@ export default function App() {
     report: false,
     notes: false,
     timeline: false,
-    recipe: null as Recipe | null
+    recipe: null as Recipe | null,
+    editingShot: null as Shot | null
   });
 
 
@@ -131,8 +132,14 @@ export default function App() {
     const validation = validateShot(shot.date, shot.time);
     if (!validation.valid) throw new Error(validation.error || 'Invalid shot data');
     await actions.saveShot(shot);
-    setModals(prev => ({ ...prev, shot: false }));
+    setModals(prev => ({ ...prev, shot: false, editingShot: null }));
   }, 'Failed to save injection.');
+
+  const handleDeleteShot = (id: string) => {
+    if (window.confirm("Are you sure you want to delete this injection record?")) {
+      wrapAction(async () => await actions.deleteShot(id), 'Failed to delete injection.');
+    }
+  };
 
   const handleSaveFood = (food: { name: string; calories: number; protein: number }) => wrapAction(async () => {
     await actions.saveFood(viewDate, food);
@@ -293,9 +300,10 @@ export default function App() {
 
         <ShotModal
           isOpen={modals.shot}
-          onClose={() => closeModal('shot')}
+          onClose={() => setModals(prev => ({ ...prev, shot: false, editingShot: null }))}
           onSave={handleSaveShot}
           saving={saving}
+          initialData={modals.editingShot}
         />
 
         <FoodModal
@@ -365,6 +373,8 @@ export default function App() {
             <InjectionTimeline
               shots={shots}
               onClose={() => closeModal('timeline')}
+              onEditShot={(shot) => setModals(prev => ({ ...prev, timeline: false, shot: true, editingShot: shot }))}
+              onDeleteShot={handleDeleteShot}
             />
           )}
         </AnimatePresence>

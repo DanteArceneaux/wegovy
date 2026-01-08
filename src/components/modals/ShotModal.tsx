@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { INJECTION_SITES, DOSAGE_OPTIONS } from '../../constants';
 import { getLocalTodayStr } from '../../utils/dateHelpers';
@@ -7,11 +7,12 @@ import { Shot } from '../../types';
 interface ShotModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (shot: Omit<Shot, 'id'>) => Promise<void>;
+  onSave: (shot: Omit<Shot, 'id'> & { id?: string }) => Promise<void>;
   saving: boolean;
+  initialData?: Shot | null;
 }
 
-export const ShotModal = ({ isOpen, onClose, onSave, saving }: ShotModalProps) => {
+export const ShotModal = ({ isOpen, onClose, onSave, saving, initialData }: ShotModalProps) => {
   const [newShot, setNewShot] = useState({
     date: getLocalTodayStr(),
     time: '09:00',
@@ -20,18 +21,42 @@ export const ShotModal = ({ isOpen, onClose, onSave, saving }: ShotModalProps) =
     notes: ''
   });
 
+  // Sync state when initialData changes (for editing)
+  useEffect(() => {
+    if (initialData) {
+      setNewShot({
+        date: initialData.date,
+        time: initialData.time,
+        dosage: initialData.dosage,
+        site: siteToConstant(initialData.site),
+        notes: initialData.notes || ''
+      });
+    } else {
+      setNewShot({
+        date: getLocalTodayStr(),
+        time: '09:00',
+        dosage: '0.25',
+        site: 'Right Thigh',
+        notes: ''
+      });
+    }
+  }, [initialData, isOpen]);
+
   if (!isOpen) return null;
 
   const handleSave = async () => {
-    await onSave(newShot);
-    setNewShot({
-      date: getLocalTodayStr(),
-      time: '09:00',
-      dosage: '0.25',
-      site: 'Right Thigh',
-      notes: ''
-    });
+    await onSave(initialData ? { ...newShot, id: initialData.id } : newShot);
+    onClose();
   };
+
+  // Helper to match string to constant if needed
+  function siteToConstant(site: string) {
+    if (INJECTION_SITES.includes(site as any)) return site as any;
+    // Fallback if there's a minor label mismatch
+    if (site === 'Stomach (L)') return 'Stomach (L)';
+    if (site === 'Stomach (R)') return 'Stomach (R)';
+    return 'Right Thigh';
+  }
 
   return (
     <div className="absolute inset-0 bg-black/60 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in">
@@ -80,8 +105,8 @@ export const ShotModal = ({ isOpen, onClose, onSave, saving }: ShotModalProps) =
                 onClick={() => setNewShot({ ...newShot, site })}
                 disabled={saving}
                 className={`p-3 text-sm font-bold rounded-xl transition-all ${newShot.site === site
-                    ? 'bg-purple-600 text-white shadow-lg shadow-purple-200'
-                    : 'bg-slate-50 text-slate-500'
+                  ? 'bg-purple-600 text-white shadow-lg shadow-purple-200'
+                  : 'bg-slate-50 text-slate-500'
                   }`}
               >
                 {site}

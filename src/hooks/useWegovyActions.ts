@@ -1,5 +1,4 @@
 import { useCallback } from 'react';
-import { User } from 'firebase/auth';
 import {
   collection,
   addDoc,
@@ -9,33 +8,45 @@ import {
   getDoc,
   serverTimestamp
 } from 'firebase/firestore';
-import { db, appId } from '../config/firebase';
+import { db, appId, GLOBAL_USER_ID } from '../config/firebase';
 import { Settings, Shot, FoodItem, Symptoms } from '../types';
 
-export const useWegovyActions = (user: User | null) => {
-  const saveSettings = useCallback(async (settings: Settings) => {
-    if (!user) return;
-    const settingsRef = doc(db, 'artifacts', appId, 'users', user.uid, 'settings', 'profile');
-    await setDoc(settingsRef, settings, { merge: true });
-  }, [user]);
+export const useWegovyActions = () => {
+  const uid = GLOBAL_USER_ID;
 
-  const saveShot = useCallback(async (shot: Omit<Shot, 'id'>) => {
-    if (!user) return;
-    await addDoc(collection(db, 'artifacts', appId, 'users', user.uid, 'shots'), {
-      ...shot,
-      timestamp: serverTimestamp()
-    });
-  }, [user]);
+  const saveSettings = useCallback(async (settings: Settings) => {
+    const settingsRef = doc(db, 'artifacts', appId, 'users', uid, 'settings', 'profile');
+    await setDoc(settingsRef, settings, { merge: true });
+  }, [uid]);
+
+  const saveShot = useCallback(async (shot: Omit<Shot, 'id'> & { id?: string }) => {
+    if (shot.id) {
+      // Update existing
+      const { id, ...data } = shot;
+      await setDoc(doc(db, 'artifacts', appId, 'users', uid, 'shots', id), {
+        ...data,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    } else {
+      // Add new
+      await addDoc(collection(db, 'artifacts', appId, 'users', uid, 'shots'), {
+        ...shot,
+        timestamp: serverTimestamp()
+      });
+    }
+  }, [uid]);
+
+  const deleteShot = useCallback(async (id: string) => {
+    await deleteDoc(doc(db, 'artifacts', appId, 'users', uid, 'shots', id));
+  }, [uid]);
 
   const saveFood = useCallback(async (viewDate: string, food: Omit<FoodItem, 'id' | 'dateString'>) => {
-    if (!user) return;
-
-    const logRef = doc(db, 'artifacts', appId, 'users', user.uid, 'dailyLogs', viewDate);
+    const logRef = doc(db, 'artifacts', appId, 'users', uid, 'dailyLogs', viewDate);
     const logSnap = await getDoc(logRef);
     const currentLog = logSnap.exists() ? logSnap.data() : { calories: 0, protein: 0 };
 
     await Promise.all([
-      addDoc(collection(db, 'artifacts', appId, 'users', user.uid, 'foodItems'), {
+      addDoc(collection(db, 'artifacts', appId, 'users', uid, 'foodItems'), {
         ...food,
         dateString: viewDate,
         timestamp: serverTimestamp()
@@ -48,73 +59,66 @@ export const useWegovyActions = (user: User | null) => {
         notes: currentLog.notes || ''
       }, { merge: true })
     ]);
-  }, [user]);
+  }, [uid]);
 
   const updateWater = useCallback(async (viewDate: string, amount: number) => {
-    if (!user) return;
-    const logRef = doc(db, 'artifacts', appId, 'users', user.uid, 'dailyLogs', viewDate);
+    const logRef = doc(db, 'artifacts', appId, 'users', uid, 'dailyLogs', viewDate);
     const logSnap = await getDoc(logRef);
     const currentLog = logSnap.exists() ? logSnap.data() : { water: 0 };
 
     await setDoc(logRef, {
       water: Math.max(0, (currentLog.water || 0) + amount)
     }, { merge: true });
-  }, [user]);
+  }, [uid]);
 
   const saveWeight = useCallback(async (viewDate: string, weight: number) => {
-    if (!user) return;
-    await addDoc(collection(db, 'artifacts', appId, 'users', user.uid, 'weight'), {
+    await addDoc(collection(db, 'artifacts', appId, 'users', uid, 'weight'), {
       weight,
       date: viewDate,
       timestamp: serverTimestamp()
     });
-  }, [user]);
+  }, [uid]);
 
   const saveSymptoms = useCallback(async (viewDate: string, symptoms: Symptoms) => {
-    if (!user) return;
     await setDoc(
-      doc(db, 'artifacts', appId, 'users', user.uid, 'dailyLogs', viewDate),
+      doc(db, 'artifacts', appId, 'users', uid, 'dailyLogs', viewDate),
       { symptoms },
       { merge: true }
     );
-  }, [user]);
+  }, [uid]);
 
   const saveNotes = useCallback(async (viewDate: string, notes: string) => {
-    if (!user) return;
     await setDoc(
-      doc(db, 'artifacts', appId, 'users', user.uid, 'dailyLogs', viewDate),
+      doc(db, 'artifacts', appId, 'users', uid, 'dailyLogs', viewDate),
       { notes },
       { merge: true }
     );
-  }, [user]);
+  }, [uid]);
 
   const deleteFood = useCallback(async (viewDate: string, id: string, cals: number, prot: number) => {
-    if (!user) return;
-    const logRef = doc(db, 'artifacts', appId, 'users', user.uid, 'dailyLogs', viewDate);
+    const logRef = doc(db, 'artifacts', appId, 'users', uid, 'dailyLogs', viewDate);
     const logSnap = await getDoc(logRef);
     const currentLog = logSnap.exists() ? logSnap.data() : { calories: 0, protein: 0 };
 
     await Promise.all([
-      deleteDoc(doc(db, 'artifacts', appId, 'users', user.uid, 'foodItems', id)),
+      deleteDoc(doc(db, 'artifacts', appId, 'users', uid, 'foodItems', id)),
       setDoc(logRef, {
         calories: Math.max(0, (currentLog.calories || 0) - cals),
         protein: Math.max(0, (currentLog.protein || 0) - prot)
       }, { merge: true })
     ]);
-  }, [user]);
+  }, [uid]);
 
   const toggleGroceryItem = useCallback(async (boughtItems: Record<string, boolean>, item: string) => {
-    if (!user) return;
-    const listRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'shoppingList');
+    const listRef = doc(db, 'artifacts', appId, 'users', uid, 'data', 'shoppingList');
     const newState = { ...boughtItems, [item]: !boughtItems[item] };
     await setDoc(listRef, newState, { merge: true });
-  }, [user]);
+  }, [uid]);
 
   const resetGroceryList = useCallback(async () => {
-    if (!user) return;
-    const listRef = doc(db, 'artifacts', appId, 'users', user.uid, 'data', 'shoppingList');
+    const listRef = doc(db, 'artifacts', appId, 'users', uid, 'data', 'shoppingList');
     await setDoc(listRef, {});
-  }, [user]);
+  }, [uid]);
 
   return {
     saveSettings,
@@ -125,6 +129,7 @@ export const useWegovyActions = (user: User | null) => {
     saveSymptoms,
     saveNotes,
     deleteFood,
+    deleteShot,
     toggleGroceryItem,
     resetGroceryList
   };

@@ -32,5 +32,8 @@ const db = getFirestore(app);
 // For development multi-tenancy support if needed
 export const appId = import.meta.env.VITE_APP_ID || 'default-app-id';
 
+// Single User Mode: Data is permanent across devices without individual accounts
+export const GLOBAL_USER_ID = 'primary_user_dante';
+
 export { auth, db };
 

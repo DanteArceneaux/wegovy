@@ -1,4 +1,4 @@
-import { ChevronLeft, MapPin, Activity } from 'lucide-react';
+import { ChevronLeft, MapPin, Activity, Edit2, Trash2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Shot } from '../../types';
 import { Card } from '../common/Card';
@@ -7,9 +7,11 @@ import { formatDateReadable } from '../../utils/dateHelpers';
 interface InjectionTimelineProps {
     shots: Shot[];
     onClose: () => void;
+    onEditShot: (shot: Shot) => void;
+    onDeleteShot: (id: string) => void;
 }
 
-export const InjectionTimeline = ({ shots, onClose }: InjectionTimelineProps) => {
+export const InjectionTimeline = ({ shots, onClose, onEditShot, onDeleteShot }: InjectionTimelineProps) => {
     const sortedShots = [...shots].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
     // Site map coordinates/paths
@@ -157,8 +159,22 @@ export const InjectionTimeline = ({ shots, onClose }: InjectionTimelineProps) =>
                                                     {formatDateReadable(shot.date)}
                                                 </div>
                                             </div>
-                                            <div className="bg-slate-50 px-3 py-1 rounded-xl text-[10px] font-black text-slate-500 flex items-center gap-1.5 uppercase">
-                                                <MapPin className="w-3 h-3 text-indigo-500" /> {shot.site}
+                                            <div className="flex items-center gap-2">
+                                                <button
+                                                    onClick={() => onEditShot(shot)}
+                                                    className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                                >
+                                                    <Edit2 className="w-3.5 h-3.5" />
+                                                </button>
+                                                <button
+                                                    onClick={() => onDeleteShot(shot.id)}
+                                                    className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                                >
+                                                    <Trash2 className="w-3.5 h-3.5" />
+                                                </button>
+                                                <div className="bg-slate-50 px-3 py-1 rounded-xl text-[10px] font-black text-slate-500 flex items-center gap-1.5 uppercase ml-1">
+                                                    <MapPin className="w-3 h-3 text-indigo-500" /> {shot.site}
+                                                </div>
                                             </div>
                                         </div>
                                         {shot.notes && (
