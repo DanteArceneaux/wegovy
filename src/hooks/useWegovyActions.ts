@@ -1,16 +1,16 @@
 import { useCallback } from 'react';
 import { User } from 'firebase/auth';
-import { 
-  collection, 
-  addDoc, 
-  doc, 
-  deleteDoc, 
-  setDoc, 
-  getDoc, 
-  serverTimestamp 
+import {
+  collection,
+  addDoc,
+  doc,
+  deleteDoc,
+  setDoc,
+  getDoc,
+  serverTimestamp
 } from 'firebase/firestore';
 import { db, appId } from '../config/firebase';
-import { Settings, Shot, FoodItem, WeightEntry, Symptoms } from '../types';
+import { Settings, Shot, FoodItem, Symptoms } from '../types';
 
 export const useWegovyActions = (user: User | null) => {
   const saveSettings = useCallback(async (settings: Settings) => {
@@ -29,7 +29,7 @@ export const useWegovyActions = (user: User | null) => {
 
   const saveFood = useCallback(async (viewDate: string, food: Omit<FoodItem, 'id' | 'dateString'>) => {
     if (!user) return;
-    
+
     const logRef = doc(db, 'artifacts', appId, 'users', user.uid, 'dailyLogs', viewDate);
     const logSnap = await getDoc(logRef);
     const currentLog = logSnap.exists() ? logSnap.data() : { calories: 0, protein: 0 };
@@ -55,7 +55,7 @@ export const useWegovyActions = (user: User | null) => {
     const logRef = doc(db, 'artifacts', appId, 'users', user.uid, 'dailyLogs', viewDate);
     const logSnap = await getDoc(logRef);
     const currentLog = logSnap.exists() ? logSnap.data() : { water: 0 };
-    
+
     await setDoc(logRef, {
       water: Math.max(0, (currentLog.water || 0) + amount)
     }, { merge: true });
