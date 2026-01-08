@@ -1,4 +1,4 @@
-import { Calendar, ChevronLeft, MapPin, Activity } from 'lucide-react';
+import { ChevronLeft, MapPin, Activity } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Shot } from '../../types';
 import { Card } from '../common/Card';
@@ -78,10 +78,10 @@ export const InjectionTimeline = ({ shots, onClose }: InjectionTimelineProps) =>
                                         animate={{ scale: 1 }}
                                         whileHover={{ scale: 1.1 }}
                                         className={`relative w-10 h-10 rounded-full border-2 flex items-center justify-center transition-all ${isRecent
-                                                ? 'bg-indigo-600 border-indigo-200 shadow-lg shadow-indigo-200'
-                                                : count > 0
-                                                    ? 'bg-white border-indigo-100 shadow-sm'
-                                                    : 'bg-white/40 border-slate-100 opacity-40'
+                                            ? 'bg-indigo-600 border-indigo-200 shadow-lg shadow-indigo-200'
+                                            : count > 0
+                                                ? 'bg-white border-indigo-100 shadow-sm'
+                                                : 'bg-white/40 border-slate-100 opacity-40'
                                             }`}
                                     >
                                         <MapPin className={`w-4 h-4 ${isRecent ? 'text-white' : count > 0 ? 'text-indigo-600' : 'text-slate-400'}`} />
