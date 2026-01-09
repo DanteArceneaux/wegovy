@@ -34,3 +34,4 @@ export const validateShot = (date: string, time: string): { valid: boolean; erro
   return { valid: true };
 };
 
+

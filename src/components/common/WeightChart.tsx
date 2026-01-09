@@ -9,7 +9,7 @@ interface WeightChartProps {
 export const WeightChart = memo(({ data, goal }: WeightChartProps) => {
   if (!data || data.length < 2) {
     return (
-      <div className="h-40 flex items-center justify-center text-slate-400 text-[10px] font-black uppercase tracking-widest italic bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
+      <div className="h-64 flex items-center justify-center text-slate-400 text-[10px] font-black uppercase tracking-widest italic bg-slate-50/50 rounded-2xl border border-dashed border-slate-200">
         Log at least 2 weights to see trend
       </div>
     );
@@ -42,13 +42,14 @@ export const WeightChart = memo(({ data, goal }: WeightChartProps) => {
   const areaD = `${pathD} L 100,100 L 0,100 Z`;
   const goalY = 100 - ((goal - minWeight) / (maxWeight - minWeight)) * 100;
 
+
   return (
-    <div className="h-48 w-full relative">
+    <div className="h-64 w-full relative">
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="w-full h-full overflow-visible">
         <defs>
           <linearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="rgba(79, 70, 229, 0.2)" />
-            <stop offset="100%" stopColor="rgba(79, 70, 229, 0)" />
+            <stop offset="0%" stopColor="rgba(99, 102, 241, 0.25)" />
+            <stop offset="100%" stopColor="rgba(99, 102, 241, 0)" />
           </linearGradient>
         </defs>
 
@@ -56,9 +57,9 @@ export const WeightChart = memo(({ data, goal }: WeightChartProps) => {
         {goalY >= 0 && goalY <= 100 && (
           <line
             x1="0" y1={goalY} x2="100" y2={goalY}
-            stroke="rgba(16, 185, 129, 0.3)"
-            strokeWidth="0.5"
-            strokeDasharray="2"
+            stroke="rgba(16, 185, 129, 0.5)"
+            strokeWidth="0.8"
+            strokeDasharray="6 4"
           />
         )}
 
@@ -69,31 +70,48 @@ export const WeightChart = memo(({ data, goal }: WeightChartProps) => {
         <path
           d={pathD}
           fill="none"
-          stroke="#4f46e5"
-          strokeWidth="2.5"
+          stroke="#6366f1"
+          strokeWidth="3.5"
           strokeLinecap="round"
           strokeLinejoin="round"
-          style={{ filter: 'drop-shadow(0 4px 12px rgba(79, 70, 229, 0.3))' }}
+          style={{ filter: 'drop-shadow(0 4px 12px rgba(99, 102, 241, 0.3))' }}
         />
 
-        {/* Data Points */}
-        {points.map((p, i) => (
-          <circle
-            key={i}
-            cx={p.x}
-            cy={p.y}
-            r="2"
-            fill="white"
-            stroke="#4f46e5"
-            strokeWidth="1.5"
-          />
-        ))}
+        {/* Data Points - Show all but prevent overcrowding */}
+        {points.map((pt, i) => {
+          // Show point if it's start, end, or reasonably spaced (e.g. every 5th point if > 15 points)
+          const shouldShow = points.length <= 15 || i === 0 || i === points.length - 1 || i % Math.ceil(points.length / 6) === 0;
+
+          if (!shouldShow) return null;
+
+          return (
+            <g key={i}>
+              <circle
+                cx={pt.x}
+                cy={pt.y}
+                r="3.5"
+                fill="white"
+                stroke="#6366f1"
+                strokeWidth="2.5"
+                className="transition-all duration-300 hover:r-5"
+              />
+            </g>
+          );
+        })}
       </svg>
 
+      {/* Target Label */}
       {goalY >= 0 && goalY <= 100 && (
-        <div className="absolute right-0 flex items-center gap-1.5" style={{ top: `${goalY}%`, transform: 'translateY(-50%)' }}>
-          <div className="w-8 h-[1px] bg-emerald-200"></div>
-          <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest bg-emerald-50 px-1 rounded">Target</span>
+        <div
+          className="absolute right-0 flex items-center gap-2"
+          style={{
+            top: `${goalY}%`,
+            transform: 'translateY(-50%)'
+          }}
+        >
+          <div className="bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100 shadow-sm">
+            <span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Target</span>
+          </div>
         </div>
       )}
     </div>

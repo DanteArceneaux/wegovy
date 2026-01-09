@@ -78,6 +78,13 @@ export default function App() {
   }, [dailyLog]);
 
   // Memoized calculations
+  const weightForDate = useMemo(() => {
+    const entriesUpToDate = weightLog.filter(w => w.date <= viewDate);
+    if (entriesUpToDate.length === 0) return settings.startWeight;
+    // Entries are already sorted ASC in useUserData, so the last one is the latest as of viewDate
+    return entriesUpToDate[entriesUpToDate.length - 1].weight;
+  }, [weightLog, viewDate, settings.startWeight]);
+
   const currentWeight = useMemo(() => {
     return weightLog.length > 0 ? weightLog[weightLog.length - 1].weight : settings.startWeight;
   }, [weightLog, settings.startWeight]);
@@ -214,7 +221,7 @@ export default function App() {
 
 
   return (
-    <div className="bg-[#F8FAFC] min-h-screen font-sans text-slate-900 selection:bg-indigo-100">
+    <div className="bg-transparent min-h-screen font-sans text-slate-900 selection:bg-indigo-100">
       {error && <ErrorToast message={error} onClose={() => setError(null)} />}
       {saving && <LoadingSpinner message="Saving..." />}
 
@@ -242,7 +249,7 @@ export default function App() {
               shotsCount={shots.length}
               onOpenShot={() => openModal('shot')}
               onOpenTimeline={() => openModal('timeline')}
-              currentWeight={currentWeight}
+              currentWeight={weightForDate}
               totalLost={totalLost}
               onOpenWeight={() => openModal('weight')}
               dailyLog={dailyLog}

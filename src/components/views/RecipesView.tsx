@@ -140,7 +140,7 @@ export const RecipesView = ({
         </div>
 
         {STAPLES.map((cat, i) => (
-          <Card key={i} className="p-0 overflow-hidden border-white/50" delay={0.2 + (i * 0.1)}>
+          <Card key={i} className="glass-premium p-0 overflow-hidden border-white/50" delay={0.2 + (i * 0.1)}>
             <div className="h-24 relative overflow-hidden">
               <img
                 src={cat.img}

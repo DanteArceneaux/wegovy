@@ -43,7 +43,7 @@ export const useUserData = () => {
     // Shots listener
     const shotsQ = query(
       collection(db, 'artifacts', appId, 'users', uid, 'shots'),
-      orderBy('timestamp', 'desc')
+      orderBy('date', 'desc')
     );
     const unsubShots = onSnapshot(
       shotsQ,
@@ -71,7 +71,17 @@ export const useUserData = () => {
     const unsubWeight = onSnapshot(
       weightQ,
       (snap) => {
-        setWeightLog(snap.docs.map(d => ({ id: d.id, ...d.data() } as WeightEntry)));
+        const data = snap.docs.map(d => ({ id: d.id, ...d.data() } as WeightEntry));
+        data.sort((a, b) => {
+          const dateA = new Date(a.date + 'T00:00:00').getTime();
+          const dateB = new Date(b.date + 'T00:00:00').getTime();
+          if (dateA !== dateB) return dateA - dateB;
+
+          const timeA = a.timestamp?.seconds ? a.timestamp.seconds * 1000 : Date.now();
+          const timeB = b.timestamp?.seconds ? b.timestamp.seconds * 1000 : Date.now();
+          return timeA - timeB;
+        });
+        setWeightLog(data);
       },
       (err) => {
         console.error('Weight listener error:', err);

@@ -19,7 +19,7 @@ export const Card = memo(({ children, className = "", onClick, delay = 0 }: Card
     }}
     whileTap={onClick ? { scale: 0.98 } : {}}
     onClick={onClick}
-    className={`glass rounded-[2rem] p-6 transition-premium ${className}`}
+    className={`rounded-[2rem] p-6 transition-premium ${className}`}
   >
     {children}
   </motion.div>

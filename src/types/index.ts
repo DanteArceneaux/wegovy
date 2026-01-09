@@ -67,3 +67,4 @@ export interface Symptoms {
   headache: number;
 }
 
+

@@ -32,7 +32,7 @@ export const InjectionTimeline = ({ shots, onClose, onEditShot, onDeleteShot }: 
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 50 }}
-            className="fixed inset-0 bg-[#F8FAFC] z-50 overflow-y-auto scrollbar-hide"
+            className="fixed inset-0 premium-bg z-50 overflow-y-auto scrollbar-hide"
         >
             {/* Header */}
             <div className="sticky top-0 bg-white/80 backdrop-blur-xl z-10 border-b border-slate-100 px-6 py-5 flex items-center justify-between">
@@ -53,7 +53,7 @@ export const InjectionTimeline = ({ shots, onClose, onEditShot, onDeleteShot }: 
                         <div className="h-px flex-grow mx-4 bg-slate-100"></div>
                     </div>
 
-                    <Card className="p-8 relative min-h-[420px] flex items-center justify-center border-white shadow-premium overflow-hidden">
+                    <Card className="glass-premium p-8 relative min-h-[420px] flex items-center justify-center border-white shadow-premium overflow-hidden">
                         {/* Decorative Background */}
                         <div className="absolute inset-0 bg-gradient-to-b from-slate-50/50 to-white pointer-events-none" />
 
@@ -149,7 +149,7 @@ export const InjectionTimeline = ({ shots, onClose, onEditShot, onDeleteShot }: 
                                         <Activity className={`w-3.5 h-3.5 ${i === 0 ? 'text-white' : 'text-slate-400'}`} />
                                     </div>
 
-                                    <Card className={`p-5 transition-premium ${i === 0 ? 'bg-white border-indigo-100 shadow-indigo-100/20' : 'border-white'}`}>
+                                    <Card className={`p-5 transition-premium ${i === 0 ? 'bg-white border-indigo-100 shadow-indigo-100/20' : 'glass-premium border-white'}`}>
                                         <div className="flex justify-between items-start mb-2">
                                             <div>
                                                 <div className="text-sm font-black text-slate-900 leading-tight">
