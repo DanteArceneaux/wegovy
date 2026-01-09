@@ -100,9 +100,9 @@ export const Dashboard = ({
         <div className="grid grid-cols-12 gap-5">
           <Card
             delay={0.1}
-            className={`col-span-8 relative overflow-hidden flex flex-col justify-center cursor-pointer group transition-all duration-500 ${(shotsCount > 0 && cycleDay <= 2)
-                ? 'bg-gradient-to-br from-indigo-600 to-violet-700 text-white border-none shadow-[0_20px_40px_rgba(79,70,229,0.3)]'
-                : 'glass-premium shadow-premium'
+            className={`col-span-8 relative overflow-hidden cursor-pointer group ${(shotsCount > 0 && cycleDay <= 2)
+              ? 'bg-indigo-600 bg-gradient-to-br from-indigo-600 to-purple-700 text-white border-none shadow-[0_20px_40px_rgba(79,70,229,0.3)]'
+              : 'glass-premium shadow-premium'
               }`}
             onClick={onOpenTimeline}
           >
@@ -127,7 +127,7 @@ export const Dashboard = ({
             {shotsCount > 0 ? (
               <div className="space-y-4">
                 <div className="flex items-end gap-3">
-                  <h2 className="text-5xl font-black leading-none tracking-tighter">{7 - cycleDay}</h2>
+                  <h2 className="text-5xl font-black leading-none tracking-tighter">{Math.max(0, 7 - cycleDay)}</h2>
                   <div className="flex flex-col mb-1.5">
                     <span className="text-[10px] font-black uppercase tracking-[0.15em] opacity-70 leading-none mb-1">Days To</span>
                     <span className="text-xs font-black leading-none">Next Shot</span>
@@ -139,15 +139,15 @@ export const Dashboard = ({
                     <div
                       key={i}
                       className={`h-full flex-grow rounded-full transition-all duration-1000 ${i < cycleDay
-                          ? (cycleDay <= 2 ? 'bg-white/40' : 'bg-indigo-200')
-                          : (cycleDay <= 2 ? 'bg-white/10' : 'bg-slate-100/50')
+                        ? (cycleDay <= 2 ? 'bg-white/40' : 'bg-indigo-200')
+                        : (cycleDay <= 2 ? 'bg-white/10' : 'bg-slate-100/50')
                         } ${i === cycleDay ? 'animate-pulse' : ''}`}
                     />
                   ))}
                 </div>
 
                 <div className={`text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-xl w-fit ${(shotsCount > 0 && cycleDay <= 2) ? 'bg-white/20 text-indigo-50' : 'bg-indigo-50 text-indigo-600'}`}>
-                  {cycleDay === 0 ? 'Log Today' : cycleDay <= 2 ? 'Active Peak' : 'Maintenance'}
+                  {cycleDay <= 2 ? (cycleDay === 0 && shotsCount > 0 ? 'Shot Logged' : 'Active Peak') : (7 - cycleDay <= 0 ? 'Log Today' : 'Maintenance')}
                 </div>
               </div>
             ) : (
@@ -160,7 +160,7 @@ export const Dashboard = ({
 
           <Card
             delay={0.15}
-            className="col-span-4 flex flex-col items-center justify-center p-5 cursor-pointer glass-premium shadow-premium group"
+            className="col-span-4 flex flex-col items-center justify-center cursor-pointer glass-premium shadow-premium group"
             onClick={onOpenWeight}
           >
             <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em] mb-3">Weight</span>
@@ -181,7 +181,7 @@ export const Dashboard = ({
           <Card
             delay={0.2}
             onClick={onOpenSymptoms}
-            className="flex flex-col items-center justify-center gap-4 cursor-pointer glass-premium shadow-premium group py-8"
+            className="flex flex-col items-center justify-center gap-4 cursor-pointer glass-premium shadow-premium group"
           >
             <div className="relative">
               <div className={`absolute inset-0 blur-3xl opacity-30 rounded-full transition-colors ${(!dailyLog.symptoms?.nausea && !dailyLog.symptoms?.fatigue) ? 'bg-emerald-400' : 'bg-orange-400'}`}></div>
@@ -199,7 +199,7 @@ export const Dashboard = ({
 
           <Card
             delay={0.25}
-            className="flex flex-col justify-between py-6 relative overflow-hidden glass-premium shadow-premium group"
+            className="flex flex-col justify-between relative overflow-hidden glass-premium shadow-premium group"
           >
             <div className="flex justify-between items-center z-10">
               <div className="p-3 bg-blue-50 rounded-[1.2rem] border border-blue-100">
@@ -238,7 +238,7 @@ export const Dashboard = ({
             <Target className="w-4 h-4 text-slate-300" />
           </div>
 
-          <Card delay={0.3} className="glass-premium shadow-premium p-8">
+          <Card delay={0.3} className="glass-premium shadow-premium">
             <div className="flex flex-col items-center text-center gap-8 lg:flex-row lg:text-left lg:justify-between">
               <NutritionRings
                 calories={dailyLog.calories}
@@ -338,7 +338,7 @@ export const Dashboard = ({
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           onClick={onOpenNotes}
-          className="relative p-10 bg-white rounded-[3rem] border border-slate-100 shadow-premium cursor-pointer group overflow-hidden"
+          className="relative p-10 glass-premium rounded-[3rem] border border-white shadow-premium cursor-pointer group overflow-hidden"
         >
           {/* Paper Texture/Pattern */}
           <div className="absolute inset-0 opacity-[0.03] pointer-events-none" style={{ backgroundImage: 'linear-gradient(#000 1px, transparent 1px)', backgroundSize: '100% 2.5rem' }}></div>
