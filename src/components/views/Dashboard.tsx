@@ -101,7 +101,7 @@ export const Dashboard = ({
           <Card
             delay={0.1}
             className={`col-span-8 relative overflow-hidden cursor-pointer group ${(shotsCount > 0 && cycleDay <= 2)
-              ? 'bg-indigo-600 bg-gradient-to-br from-indigo-600 to-purple-700 text-white border-none shadow-[0_20px_40px_rgba(79,70,229,0.3)]'
+              ? '!bg-indigo-600 !bg-gradient-to-br from-indigo-600 to-purple-700 text-white border-none shadow-xl shadow-indigo-500/30 transition-none'
               : 'glass-premium shadow-premium'
               }`}
             onClick={onOpenTimeline}
