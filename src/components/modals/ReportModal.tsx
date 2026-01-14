@@ -65,3 +65,4 @@ export const ReportModal = ({ isOpen, onClose, totalLost, currentBMI, shots, wei
 };
 
 
+

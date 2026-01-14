@@ -79,3 +79,4 @@ export const SymptomsModal = ({ isOpen, onClose, tempSymptoms, onSymptomsChange,
 };
 
 
+
